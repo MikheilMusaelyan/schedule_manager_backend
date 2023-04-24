@@ -2,9 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from base.models import Post
-from base.serializers import PostSerializer
-
+from base.models import Post, Event
+from base.serializers import PostSerializer, EventSerializer
     
 class PostView(APIView):
     def get(self, request, pk=None):
@@ -36,3 +35,18 @@ class PostView(APIView):
             post_serializer.save()
             return Response(post_serializer.data)
         return Response(post_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class EventView(APIView):
+    
+    def get(self, request):
+        events = Event.objects.all()
+        eventSerializer = EventSerializer(events, many=True)
+        return Response(eventSerializer.data)
+    
+    def post(self, request):
+        eventSerializer = EventSerializer(data=request.data)
+        if eventSerializer.is_valid():
+            eventSerializer.save()
+            return Response(eventSerializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(eventSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
