@@ -50,3 +50,18 @@ class EventView(APIView):
             return Response(eventSerializer.data, status=status.HTTP_201_CREATED)
         
         return Response(eventSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+from django.core.mail import EmailMessage
+from django.conf import settings
+    
+class index(APIView):
+    def get(self, request):
+        email = EmailMessage(
+            'Celery task worked!',
+            'Congratulations. Celery task & email sending worked. You are the best programmer in the world.',
+            settings.EMAIL_HOST_USER,
+            ['fullstackmasters0@gmail.com'],
+        )
+        email.fail_silently=False
+        email.send()
+        return Response({'msg': 'email sent'})
