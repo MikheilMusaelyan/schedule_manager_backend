@@ -53,15 +53,9 @@ class EventView(APIView):
     
 from django.core.mail import EmailMessage
 from django.conf import settings
-    
+from .cel.tasks import sleepy
+
 class index(APIView):
     def get(self, request):
-        email = EmailMessage(
-            'Celery task worked!',
-            'Congratulations. Celery task & email sending worked. You are the best programmer in the world.',
-            settings.EMAIL_HOST_USER,
-            ['fullstackmasters0@gmail.com'],
-        )
-        email.fail_silently=False
-        email.send()
+        sleepy.delay()
         return Response({'msg': 'email sent'})
