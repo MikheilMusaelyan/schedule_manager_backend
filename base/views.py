@@ -53,9 +53,19 @@ class EventView(APIView):
     
 from django.core.mail import EmailMessage
 from django.conf import settings
-from .cel.tasks import sleepy
+from .cel.tasks import sleepy, send_email
 
 class index(APIView):
     def get(self, request):
-        sleepy.delay()
+        # sleepy.delay(4)
+        send_email('Hi', 'bro')
+        # email = EmailMessage(
+        #     'hi',
+        #     'body',
+        #     settings.EMAIL_HOST_USER,
+        #     (settings.EMAILED_TO,),
+        # )
+        
+        # email.fail_silently = False
+        # email.send()
         return Response({'msg': 'email sent'})
