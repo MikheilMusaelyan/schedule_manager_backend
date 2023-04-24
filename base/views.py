@@ -25,4 +25,14 @@ class PostView(APIView):
             return Response(post_serializer.data, status=status.HTTP_201_CREATED)
         return Response(post_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    
+    def put(self, request, pk):
+        try:
+            post = Post.objects.get(pk=pk)
+        except Post.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        post_serializer = PostSerializer(post, data=request.data)
+        if post_serializer.is_valid():
+            post_serializer.save()
+            return Response(post_serializer.data)
+        return Response(post_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
