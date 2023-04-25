@@ -9,13 +9,6 @@ class Color(models.Model):
 
     def __str__(self):
         return self.name
-        
-class Event(models.Model):
-    color = models.ForeignKey(Color, on_delete=models.SET_NULL, null=True)
-
-    start = models.IntegerField(validators=[MaxValueValidator(96), MinValueValidator(0)])
-    end = models.IntegerField(validators=[MaxValueValidator(96), MinValueValidator(0)])
-    date = models.DateField(default=datetime.date.today)
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -50,3 +43,11 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['bio']
 
     objects = CustomUserManager()
+
+class Event(models.Model):
+    color = models.ForeignKey(Color, on_delete=models.SET_NULL, null=True)
+    userId = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
+
+    start = models.IntegerField(validators=[MaxValueValidator(96), MinValueValidator(0)])
+    end = models.IntegerField(validators=[MaxValueValidator(96), MinValueValidator(0)])
+    date = models.DateField(default=datetime.date.today)

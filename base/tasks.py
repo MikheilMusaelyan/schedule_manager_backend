@@ -5,11 +5,10 @@ import smtplib
 import ssl
 from email.message import EmailMessage
 from django.conf import settings
-from rest_framework.response import Response
+
 @shared_task
 def send_the_email(sleeptime, subject, body, sendTo):
     sleep(sleeptime)
-    print('hi')
 
     email_sender = settings.EMAIL_HOST_USER
     email_password = settings.EMAIL_HOST_PASSWORD
