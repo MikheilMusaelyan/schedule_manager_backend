@@ -46,7 +46,6 @@ class EventView(APIView):
             
             if event.get('start') >= event.get('end'):
                 event['end'] = event.get('start') + 1
-                
 
             eventSerializer.save()
             return Response(eventSerializer.data, status=status.HTTP_201_CREATED)
@@ -69,8 +68,3 @@ class EventView(APIView):
     def delete(self, request, pk):
         Event.objects.filter(pk=pk).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
-class index(APIView):
-    def get(self, request):
-        send_the_email.delay(30, 'ss', ' dsa', 'sumemail')
-        return Response({'msg': 'email sent'})

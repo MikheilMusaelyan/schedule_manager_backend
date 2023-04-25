@@ -51,3 +51,4 @@ class Event(models.Model):
     start = models.IntegerField(validators=[MaxValueValidator(95), MinValueValidator(0)])
     end = models.IntegerField(validators=[MaxValueValidator(96), MinValueValidator(1)])
     date = models.DateField(default=datetime.date.today)
+    sentMail = models.BooleanField(default=False)
