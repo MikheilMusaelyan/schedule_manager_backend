@@ -17,6 +17,7 @@ class PostView(APIView):
             posts = Post.objects.all()
             postSerializer = PostSerializer(posts, many=True)
             return Response(postSerializer.data)
+        
     def post(self, request, pk=None):
         post_serializer = PostSerializer(data=request.data)
         if post_serializer.is_valid():
@@ -51,11 +52,11 @@ class EventView(APIView):
         
         return Response(eventSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-from django.core.mail import EmailMessage
-from django.conf import settings
-from .cel.tasks import send_email
+from .tasks import send_the_email
+
+from django_celery_beat.models import PeriodicTask, IntervalSchedule
 
 class index(APIView):
     def get(self, request):
-        send_email.delay(5, 'BBC news', 'hI')
+        send_the_email.delay(30, 'ss', ' dsa', 'sumemail')
         return Response({'msg': 'email sent'})
