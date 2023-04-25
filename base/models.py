@@ -3,7 +3,6 @@ from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 import datetime
 
-
 class Color(models.Model):
     name = models.CharField(max_length=20)
     pastel = models.BooleanField(default=False)

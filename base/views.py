@@ -48,8 +48,3 @@ class EventView(APIView):
         Event.objects.filter(pk=pk).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-
-class index(APIView):
-    def get(self, request):
-        send_the_email.delay(30, 'ss', ' dsa', 'sumemail')
-        return Response({'msg': 'email sent'})
