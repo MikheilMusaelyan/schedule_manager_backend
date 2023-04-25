@@ -46,6 +46,7 @@ class EventView(APIView):
             
             if event.get('start') >= event.get('end'):
                 event['end'] = event.get('start') + 1
+                
 
             eventSerializer.save()
             return Response(eventSerializer.data, status=status.HTTP_201_CREATED)
