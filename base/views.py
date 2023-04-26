@@ -4,11 +4,8 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from base.models import Event
-from base.serializers import EventSerializer
-
-from .tasks import send_the_email
-from django_celery_beat.models import PeriodicTask, IntervalSchedule
+from base.models import Event, CustomUser
+from base.serializers import EventSerializer, CustomUserSerializer
     
 class EventView(APIView):
     permission_classes = [IsAuthenticated]
@@ -68,3 +65,18 @@ class EventView(APIView):
     def delete(self, request, pk):
         Event.objects.filter(pk=pk).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class SingupView(APIView):
+    def post(self, request, **kwargs):
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        username = request.POST.get('username')
+
+        try:
+            user = CustomUser.objects.create_user(email=email, password=password, username=username, **kwargs)
+        except ValueError as error:
+            return Response(error, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = CustomUserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
