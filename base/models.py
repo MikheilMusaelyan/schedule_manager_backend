@@ -3,7 +3,6 @@ from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 import datetime
 
-
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
@@ -51,8 +50,11 @@ class Event(models.Model):
     start = models.IntegerField(validators=[MaxValueValidator(95), MinValueValidator(0)])
     end = models.IntegerField(validators=[MaxValueValidator(96), MinValueValidator(1)])
     date = models.DateField(default=datetime.date.today)
-    sentMail = models.BooleanField(default=False)
 
 class CollabMember(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     member = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+
+class Mail(models.Model):
+    eventId = models.ForeignKey(Event, on_delete=models.CASCADE)
+    sentMail = models.BooleanField(default=False)

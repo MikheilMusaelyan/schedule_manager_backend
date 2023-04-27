@@ -89,3 +89,10 @@ class index(APIView):
         send_the_email.delay()
         return Response({'msg': 'hi'})
     
+class Collaborations(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request):
+        otherUser = request.POST.get('user')
+     
