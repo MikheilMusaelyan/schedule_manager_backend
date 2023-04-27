@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from base.models import Event, CustomUser
+from base.models import Event, CustomUser, CollabMember
 
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
@@ -10,3 +10,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['username', 'is_staff']
+
+class CollabSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CollabMember
+        fields = '__all__'

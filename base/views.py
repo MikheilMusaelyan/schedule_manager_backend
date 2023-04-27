@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from base.models import Event, CustomUser
+from base.models import Event, CustomUser, Mail, CollabMember
 from base.serializers import EventSerializer, CustomUserSerializer
     
 class EventView(APIView):
@@ -94,5 +94,9 @@ class Collaborations(APIView):
     authentication_classes = [JWTAuthentication]
 
     def post(self, request):
-        otherUser = request.POST.get('user')
+        userId = request.POST.get('user')
+        eventId = request.POST.get('eventId')
+
+        
+
      
