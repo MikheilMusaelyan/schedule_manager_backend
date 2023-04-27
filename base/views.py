@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from base.models import Event, CustomUser
@@ -68,15 +68,24 @@ class EventView(APIView):
 
 
 class SingupView(APIView):
+    permission_classes = [AllowAny]
     def post(self, request, **kwargs):
         email = request.POST.get('email')
         password = request.POST.get('password')
         username = request.POST.get('username')
-
+        print(email, username, password, '{"email": "myemail@gmail.com", "username": "nousernaem", "password": "Balishi1"}')
         try:
             user = CustomUser.objects.create_user(email=email, password=password, username=username, **kwargs)
         except ValueError as error:
-            return Response(error, status=status.HTTP_400_BAD_REQUEST)
+            return Response(str(error), status=status.HTTP_400_BAD_REQUEST)
 
         serializer = CustomUserSerializer(user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+from base.tasks import send_the_email
+class index(APIView):
+    permission_classes = [AllowAny]
+    def get(req,self):
+        send_the_email.delay()
+        return Response({'msg': 'hi'})
+    
