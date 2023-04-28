@@ -6,6 +6,11 @@ class EventSerializer(serializers.ModelSerializer):
         model = Event
         fields = ['start', 'end', 'date', 'color']
 
+class SearchEventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = '__all__'
+
 # class CustomUserSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = CustomUser

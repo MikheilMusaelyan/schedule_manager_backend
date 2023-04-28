@@ -8,6 +8,8 @@ from base.models import Event, CustomUser, Mail
 from base.serializers import EventSerializer
 
 from datetime import datetime
+
+from django.db.models import Q
     
 class EventView(APIView):
     permission_classes = [IsAuthenticated]
@@ -38,11 +40,11 @@ class EventView(APIView):
 
         if eventSerializer.is_valid():
             event = eventSerializer.validated_data
-            event['userId'] = request.user.id
-            event['color'] = 'Blue'
+            event['userId'] = request.user
             
             if event.get('start') >= event.get('end'):
                 event['end'] = event.get('start') + 1
+            print(event)
 
             eventSerializer.save()
             return Response(eventSerializer.data, status=status.HTTP_201_CREATED)
@@ -120,6 +122,26 @@ class SingupView(APIView):
             'refresh': str(refresh)
         }, status=status.HTTP_201_CREATED)
 
+class SearchEvents(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(request, self):
+        name = request.GET.get('name')
+        start = request.GET.get('start')
+        date = request.GET.get('date')
+        user_id = request.user.id
+
+        events = Event.objects.filter(
+            Q(name__icontains=name) if name else Q(),
+            start=start,
+            date=date,
+            userId=user_id
+        )
+
+        eventSerializer = eventSerializer(events, many=True)
+
+        return Response(eventSerializer.data)
     
 # from base.tasks import send_the_email
 # class index(APIView):
