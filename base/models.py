@@ -26,7 +26,7 @@ class CustomUserManager(BaseUserManager):
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=50, unique=True)
-    username = models.CharField(max_length=30, default='')
+    # username = models.CharField(max_length=30, default='', unique=True)
     password = models.CharField(max_length=20)
     is_staff = models.BooleanField(default=False)
 
@@ -51,9 +51,9 @@ class Event(models.Model):
     end = models.IntegerField(validators=[MaxValueValidator(96), MinValueValidator(1)])
     date = models.DateField(default=datetime.date.today)
 
-class CollabMember(models.Model):
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    member = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+# class CollabMember(models.Model):
+#     event = models.ForeignKey(Event, on_delete=models.CASCADE)
+#     member = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
 
 class Mail(models.Model):
     eventId = models.ForeignKey(Event, on_delete=models.CASCADE)

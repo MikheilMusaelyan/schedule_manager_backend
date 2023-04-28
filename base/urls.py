@@ -1,6 +1,6 @@
 from django.urls import path
 from rest_framework_simplejwt import views
-from base.views import EventView, SingupView, index
+from base.views import EventView, SingupView
 
 urlpatterns = [
     path('token/', views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -11,5 +11,5 @@ urlpatterns = [
     path('event/', EventView.as_view(), name='event'),
     path('event/<int:pk>/', EventView.as_view(), name='event'),
 
-    path('index/', index.as_view(), name='index'),
+    # path('index/', index.as_view(), name='index'),
 ]

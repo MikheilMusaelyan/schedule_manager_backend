@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from base.models import Event, CustomUser, Mail, CollabMember
+from base.models import Event, CustomUser, Mail
 from base.serializers import EventSerializer, CustomUserSerializer
     
 class EventView(APIView):
@@ -22,7 +22,7 @@ class EventView(APIView):
         year = request.GET.get('year')
         month = request.GET.get('month')
         day = request.GET.get('day')
-        userID = request.GET.get('userId')
+        userID = request.user.id
 
         events = Event.objects.filter(date__year=year, date__month=month, userId=userID)
         eventSerializer = EventSerializer(events, many=True)
@@ -72,31 +72,38 @@ class SingupView(APIView):
     def post(self, request, **kwargs):
         email = request.POST.get('email')
         password = request.POST.get('password')
-        username = request.POST.get('username')
-        print(email, username, password, '{"email": "myemail@gmail.com", "username": "nousernaem", "password": "Balishi1"}')
+        # username = request.POST.get('username')
+
         try:
-            user = CustomUser.objects.create_user(email=email, password=password, username=username, **kwargs)
+            CustomUser.objects.create_user(email=email, password=password, username=username, **kwargs,)
         except ValueError as error:
             return Response(str(error), status=status.HTTP_400_BAD_REQUEST)
-
-        serializer = CustomUserSerializer(user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
-from base.tasks import send_the_email
-class index(APIView):
-    permission_classes = [AllowAny]
-    def get(req,self):
-        send_the_email.delay()
-        return Response({'msg': 'hi'})
-    
-class Collaborations(APIView):
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [JWTAuthentication]
-
-    def post(self, request):
-        userId = request.POST.get('user')
-        eventId = request.POST.get('eventId')
-
         
+        # userSerializer = CustomUserSerializer(user)
+        return Response(status=status.HTTP_201_CREATED)
+    
+# from base.tasks import send_the_email
+# class index(APIView):
+    # permission_classes = [AllowAny]
+    # def get(req,self):
+    #     send_the_email.delay()
+    #     return Response({'msg': 'hi'})
+    
+# class Colaborations(APIView):
+#     permission_classes = [IsAuthenticated]
+#     authentication_classes = [JWTAuthentication]
 
-     
+#     def post(self, request):
+#         eventId = request.POST.get('eventId')
+#         otherUserId = request.POST.get('otherUserId')
+        
+#         event = Event.objects.filter(id=eventId)
+#         if event.userId != request.user.id:
+#             return
+
+#         colabSerializer = CollabSerializer(request.data)
+#         if colabSerializer.is_valid:
+#             colabSerializer.save()
+#             return Response(colabSerializer.data, status=status.HTTP_201_CREATED)
+#         return Response(colabSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
