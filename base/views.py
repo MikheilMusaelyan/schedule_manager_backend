@@ -5,24 +5,20 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from base.models import Event, CustomUser, Mail
-from base.serializers import EventSerializer, CustomUserSerializer
+from base.serializers import EventSerializer
     
 class EventView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
-    def get(self, request, pk=None):
-        if pk is not None:
-            event = Event.objects.get(pk=pk)
-            eventSerializer = EventSerializer(event)
-            if event is None:
-                return Response(eventSerializer.errors, status=status.HTTP_404_NOT_FOUND)
-            return Response(eventSerializer.data)
-        
+    def get(self, request, bool=None):
         year = request.GET.get('year')
         month = request.GET.get('month')
         day = request.GET.get('day')
         userID = request.user.id
+
+        if bool is not None:
+            events = Event.objects.filter(userId=userID).order_by('date', 'start')[:3]      
 
         events = Event.objects.filter(date__year=year, date__month=month, userId=userID)
         eventSerializer = EventSerializer(events, many=True)
@@ -66,21 +62,42 @@ class EventView(APIView):
         Event.objects.filter(pk=pk).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
+from django.contrib.auth import authenticate
+
+class LoginView(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []
+    def post(self, request):
+        # Authenticate the user
+        user = authenticate(email=request.POST.get('email'), password=request.POST.get('password'))
+        if user is None:
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Generate a JWT token with additional data
+        access_token = AccessToken.for_user(user)
+        refresh_token = RefreshToken.for_user(user)
+
+        # Return the JWT token as a response
+        return Response({'token': str(access_token), 'refresh': str(refresh_token)})
 
 class SingupView(APIView):
     permission_classes = [AllowAny]
+    authentication_classes = []
+    
     def post(self, request, **kwargs):
         email = request.POST.get('email')
         password = request.POST.get('password')
         # username = request.POST.get('username')
 
         try:
-            CustomUser.objects.create_user(email=email, password=password, username=username, **kwargs,)
+            CustomUser.objects.create_user(email=email, password=password, **kwargs,)
         except ValueError as error:
             return Response(str(error), status=status.HTTP_400_BAD_REQUEST)
         
         # userSerializer = CustomUserSerializer(user)
         return Response(status=status.HTTP_201_CREATED)
+
     
 # from base.tasks import send_the_email
 # class index(APIView):
