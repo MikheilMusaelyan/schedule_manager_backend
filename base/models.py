@@ -42,7 +42,7 @@ class Color(models.Model):
 
     def __str__(self):
         return self.name
-    
+
 class Event(models.Model):
     color = models.ForeignKey(Color, on_delete=models.SET_NULL, null=True)
     userId = models.ForeignKey(CustomUser, on_delete=models.CASCADE)

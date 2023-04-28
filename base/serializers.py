@@ -4,7 +4,7 @@ from base.models import Event, CustomUser
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
-        fields = '__all__'
+        fields = ['start', 'end', 'date', 'color']
 
 # class CustomUserSerializer(serializers.ModelSerializer):
 #     class Meta:

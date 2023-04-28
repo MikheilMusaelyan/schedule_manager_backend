@@ -6,6 +6,8 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from base.models import Event, CustomUser, Mail
 from base.serializers import EventSerializer
+
+from datetime import datetime
     
 class EventView(APIView):
     permission_classes = [IsAuthenticated]
@@ -36,6 +38,8 @@ class EventView(APIView):
 
         if eventSerializer.is_valid():
             event = eventSerializer.validated_data
+            event['userId'] = request.user.id
+            event['color'] = 'Blue'
             
             if event.get('start') >= event.get('end'):
                 event['end'] = event.get('start') + 1
@@ -73,12 +77,27 @@ class LoginView(APIView):
         user = authenticate(email=request.POST.get('email'), password=request.POST.get('password'))
         if user is None:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        now = datetime.now()
+        year = now.year
+        month = str(now.month).zfill(2)
+        day = now.day
+
+        events = Event.objects.filter(date__year=year, date__month=month, userId=user.id)
+        eventSerializer = EventSerializer(events, many=True)
+
+        for date in eventSerializer.data:
+            if str(date['date']) == f"{year}-{month}-{day}":
+                date['requested_day'] = True
+            else:
+                date['requested_day'] = False
 
         refresh = RefreshToken.for_user(user)
 
         return Response({
             'access': str(refresh.access_token),
-            'refresh': str(refresh)
+            'refresh': str(refresh),
+            'events': eventSerializer.data
         }, status=status.HTTP_200_OK)
 
 class SingupView(APIView):
