@@ -68,18 +68,18 @@ from django.contrib.auth import authenticate
 class LoginView(APIView):
     permission_classes = [AllowAny]
     authentication_classes = []
+
     def post(self, request):
-        # Authenticate the user
         user = authenticate(email=request.POST.get('email'), password=request.POST.get('password'))
         if user is None:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Generate a JWT token with additional data
-        access_token = AccessToken.for_user(user)
-        refresh_token = RefreshToken.for_user(user)
+        refresh = RefreshToken.for_user(user)
 
-        # Return the JWT token as a response
-        return Response({'token': str(access_token), 'refresh': str(refresh_token)})
+        return Response({
+            'access': str(refresh.access_token),
+            'refresh': str(refresh)
+        }, status=status.HTTP_200_OK)
 
 class SingupView(APIView):
     permission_classes = [AllowAny]
@@ -91,12 +91,15 @@ class SingupView(APIView):
         # username = request.POST.get('username')
 
         try:
-            CustomUser.objects.create_user(email=email, password=password, **kwargs,)
+            user = CustomUser.objects.create_user(email=email, password=password, **kwargs,)
         except ValueError as error:
             return Response(str(error), status=status.HTTP_400_BAD_REQUEST)
         
-        # userSerializer = CustomUserSerializer(user)
-        return Response(status=status.HTTP_201_CREATED)
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            'access': str(refresh.access_token),
+            'refresh': str(refresh)
+        }, status=status.HTTP_201_CREATED)
 
     
 # from base.tasks import send_the_email
