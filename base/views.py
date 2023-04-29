@@ -15,14 +15,11 @@ class EventView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
-    def get(self, request, bool=None):
+    def get(self, request):
         year = request.GET.get('year')
         month = request.GET.get('month')
         day = request.GET.get('day')
         userID = request.user.id
-
-        if bool is not None:
-            events = Event.objects.filter(userId=userID).order_by('date', 'start')[:3]      
 
         events = Event.objects.filter(date__year=year, date__month=month, userId=userID)
         eventSerializer = EventSerializer(events, many=True)
@@ -44,7 +41,6 @@ class EventView(APIView):
             
             if event.get('start') >= event.get('end'):
                 event['end'] = event.get('start') + 1
-            print(event)
 
             eventSerializer.save()
             return Response(eventSerializer.data, status=status.HTTP_201_CREATED)
@@ -67,8 +63,8 @@ class EventView(APIView):
     def delete(self, request, pk):
         Event.objects.filter(pk=pk).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
+    
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 
 class LoginView(APIView):
@@ -85,6 +81,8 @@ class LoginView(APIView):
         month = str(now.month).zfill(2)
         day = now.day
 
+        upcomingEvents = Event.objects.filter(userId=user.id).order_by('date', 'start')[:3]
+        
         events = Event.objects.filter(date__year=year, date__month=month, userId=user.id)
         eventSerializer = EventSerializer(events, many=True)
 
@@ -109,7 +107,6 @@ class SingupView(APIView):
     def post(self, request, **kwargs):
         email = request.POST.get('email')
         password = request.POST.get('password')
-        # username = request.POST.get('username')
 
         try:
             user = CustomUser.objects.create_user(email=email, password=password, **kwargs,)

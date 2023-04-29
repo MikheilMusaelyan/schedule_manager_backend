@@ -6,6 +6,11 @@ class EventSerializer(serializers.ModelSerializer):
         model = Event
         fields = ['start', 'end', 'date', 'color', 'name']
 
+class UpcomingEventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = ['start', 'end', 'date', 'color', 'name']
+
 class SearchEventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
