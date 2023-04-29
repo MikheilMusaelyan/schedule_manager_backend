@@ -126,20 +126,31 @@ class SearchEvents(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get(request, self):
+    def get(self, request):
         name = request.GET.get('name')
         start = request.GET.get('start')
-        date = request.GET.get('date')
-        user_id = request.user.id
+        day = request.GET.get('day')
+        month = request.GET.get('month')
+        year = request.GET.get('year')
 
-        events = Event.objects.filter(
-            Q(name__icontains=name) if name else Q(),
-            start=start,
-            date=date,
-            userId=user_id
-        )
+        user_id = int(request.user.id)
 
-        eventSerializer = eventSerializer(events, many=True)
+
+        filter_condition = Q(userId=user_id)
+
+        if name:
+            filter_condition &= Q(name__icontains=name)
+        if start:
+            filter_condition &= Q(start=start)
+        if year:
+            filter_condition &= Q(date__year=year)
+        if month:
+            filter_condition &= Q(date__month=month)
+        if day:
+            filter_condition &= Q(date__day=day)
+
+        events = Event.objects.filter(filter_condition)
+        eventSerializer = EventSerializer(events, many=True)
 
         return Response(eventSerializer.data)
     

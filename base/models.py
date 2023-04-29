@@ -47,6 +47,7 @@ class Event(models.Model):
     color = models.ForeignKey(Color, on_delete=models.SET_NULL, null=True)
     userId = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
 
+    name = models.CharField(max_length=50, default='(No title)')
     start = models.IntegerField(validators=[MaxValueValidator(95), MinValueValidator(0)])
     end = models.IntegerField(validators=[MaxValueValidator(96), MinValueValidator(1)])
     date = models.DateField(default=datetime.date.today)
