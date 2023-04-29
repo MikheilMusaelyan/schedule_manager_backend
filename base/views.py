@@ -5,9 +5,10 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from base.models import Event, CustomUser, Mail
-from base.serializers import EventSerializer
+from base.serializers import EventSerializer, UpcomingEventSerializer
 
 from datetime import datetime
+from datetime import date as TODAY
 
 from django.db.models import Q
     
@@ -66,6 +67,7 @@ class EventView(APIView):
     
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
+import math
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
@@ -77,12 +79,21 @@ class LoginView(APIView):
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
         
         now = datetime.now()
+
         year = now.year
         month = str(now.month).zfill(2)
         day = now.day
+        hour = now.hour * 4
+        minute = now.minute
 
-        upcomingEvents = Event.objects.filter(userId=user.id).order_by('date', 'start')[:3]
+        hour += math.floor(minute / 15)
         
+        upcomingEvents = Event.objects.filter(
+            Q(date__gt=now) | Q(date=now, start__gte=hour),
+            userId=user.id
+        ).order_by('date', 'start')[:3]
+        upcomingEventSerializer = UpcomingEventSerializer(upcomingEvents, many=True)
+
         events = Event.objects.filter(date__year=year, date__month=month, userId=user.id)
         eventSerializer = EventSerializer(events, many=True)
 
@@ -97,7 +108,8 @@ class LoginView(APIView):
         return Response({
             'access': str(refresh.access_token),
             'refresh': str(refresh),
-            'events': eventSerializer.data
+            'events': eventSerializer.data,
+            'upcoming': upcomingEventSerializer.data
         }, status=status.HTTP_200_OK)
 
 class SingupView(APIView):
