@@ -4,13 +4,16 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from base.models import Event, CustomUser, Mail
+from base.models import Event, CustomUser, Mail, Color
 from base.serializers import EventSerializer, UpcomingEventSerializer
+import json
 
 from datetime import datetime
 from datetime import date as TODAY
 
 from django.db.models import Q
+
+
     
 class EventView(APIView):
     permission_classes = [IsAuthenticated]
@@ -34,8 +37,14 @@ class EventView(APIView):
         return Response(eventSerializer.data)
     
     def post(self, request):
+        color = Color.objects.get_or_create(
+            name = request.data.get('color').get('name'),
+            pastel = request.data.get('color').get('pastel')
+        )
+        request.data['color'] = getattr(color[0], 'pk')
+        
         eventSerializer = EventSerializer(data=request.data)
-
+        
         if eventSerializer.is_valid():
             event = eventSerializer.validated_data
             event['userId'] = request.user

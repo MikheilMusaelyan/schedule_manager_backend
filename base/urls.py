@@ -8,7 +8,6 @@ urlpatterns = [
     path('refresh/', views.TokenRefreshView.as_view(), name='token_refresh'),
     
     path('event/', EventView.as_view(), name='event'),
-    path('event/<int:bool>/', EventView.as_view(), name='event'),
 
     path('search/', SearchEvents.as_view(), name='s')
 

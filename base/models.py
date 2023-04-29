@@ -41,6 +41,9 @@ class Color(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def get_model_fields(model):
+        return model._meta.fields
 
 class Event(models.Model):
     color = models.ForeignKey(Color, on_delete=models.SET_NULL, null=True)
