@@ -38,9 +38,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 class Color(models.Model):
     name = models.CharField(max_length=20, primary_key=True)
     pastel = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.name
     
     def get_model_fields(model):
         return model._meta.fields

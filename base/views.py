@@ -6,43 +6,50 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from base.models import Event, CustomUser, Mail, Color
 from base.serializers import EventSerializer, UpcomingEventSerializer
-import json
 
 from datetime import datetime
-from datetime import date as TODAY
-
 from django.db.models import Q
-
-
+from datetime import datetime
     
 class EventView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
-    def get(self, request):
-        year = request.GET.get('year')
-        month = request.GET.get('month')
-        day = request.GET.get('day')
+    def get(self, request, day=None, month=None, year=None):
+        
         userID = request.user.id
 
-        events = Event.objects.filter(date__year=year, date__month=month, userId=userID)
+        events = Event.objects.filter(date__year=year, date__month=month, userId=userID).order_by('date')
         eventSerializer = EventSerializer(events, many=True)
 
-        for date in eventSerializer.data:
-            if str(date['date']) == f"{year}-{month}-{day}":
-                date['requested_day'] = True
-            else:
-                date['requested_day'] = False
-        
-        return Response(eventSerializer.data)
+        dateObject = {}
+
+        for event in eventSerializer.data:
+            
+            dayObject = datetime.strptime(event['date'], '%Y-%m-%d')
+            formatted_date = dayObject.strftime("%B %d, %Y")
+            day = dayObject.day
+
+            if f'd{day}' not in dateObject:
+                dateObject[f'd{day}'] = []
+
+            event['color'] = {
+                'name' : event['color'],
+                'pastel': True
+            }
+            event['date'] = formatted_date
+            
+            dateObject[f'd{day}'].append(event)
+
+        return Response(dateObject)
     
-    def post(self, request):
+    def post(self, request, pk=None):
+        
         color = Color.objects.get_or_create(
             name = request.data.get('color').get('name'),
-            pastel = request.data.get('color').get('pastel')
         )
-        request.data['color'] = getattr(color[0], 'pk')
         
+        request.data['color'] = getattr(color[0], 'pk')
         eventSerializer = EventSerializer(data=request.data)
         
         if eventSerializer.is_valid():
@@ -51,17 +58,30 @@ class EventView(APIView):
             
             if event.get('start') >= event.get('end'):
                 event['end'] = event.get('start') + 1
-
-            eventSerializer.save()
-            return Response(eventSerializer.data, status=status.HTTP_201_CREATED)
+        
+            eventInstance = eventSerializer.save()
+            
+            return Response(
+                eventInstance.pk, 
+                status=status.HTTP_201_CREATED
+            )
         
         return Response(eventSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def put(self, request, pk):
+    def put(self, request, pk=None):
         try:
-            event = Event.objects.get(pk=pk)
-        except event.DoesNotExist:
+            event = Event.objects.get(
+                pk=pk,
+                userId = request.user.id
+            )
+        except:
             return Response(status=status.HTTP_404_NOT_FOUND)
+        
+        color = Color.objects.get_or_create(
+            name = request.data.get('color').get('name'),
+        )
+        
+        request.data['color'] = getattr(color[0], 'pk')
 
         eventSerializer = EventSerializer(event, data=request.data)
 
@@ -70,9 +90,14 @@ class EventView(APIView):
             return Response(eventSerializer.data, status=status.HTTP_200_OK)
         return Response(eventSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def delete(self, request, pk):
-        Event.objects.filter(pk=pk).delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def delete(self, request, pk=None):
+        try:
+            event = Event.objects.get(id=pk, userId=request.user.id)
+        except Event.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        event.delete()
+        return Response(status=status.HTTP_200_OK)
     
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
@@ -83,7 +108,9 @@ class LoginView(APIView):
     authentication_classes = []
 
     def post(self, request):
-        user = authenticate(email=request.POST.get('email'), password=request.POST.get('password'))
+        email = request.data.get('email')
+        password = request.data.get('password')
+        user = authenticate(email=email, password=password)
         if user is None:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
         
@@ -91,26 +118,49 @@ class LoginView(APIView):
 
         year = now.year
         month = str(now.month).zfill(2)
-        day = now.day
         hour = now.hour * 4
         minute = now.minute
 
         hour += math.floor(minute / 15)
+        print()
         
         upcomingEvents = Event.objects.filter(
             Q(date__gt=now) | Q(date=now, start__gte=hour),
             userId=user.id
         ).order_by('date', 'start')[:3]
         upcomingEventSerializer = UpcomingEventSerializer(upcomingEvents, many=True)
+        
 
         events = Event.objects.filter(date__year=year, date__month=month, userId=user.id)
         eventSerializer = EventSerializer(events, many=True)
 
-        for date in eventSerializer.data:
-            if str(date['date']) == f"{year}-{month}-{day}":
-                date['requested_day'] = True
-            else:
-                date['requested_day'] = False
+        dateObject = {}
+
+        for event in eventSerializer.data:
+            
+            dayObject = datetime.strptime(event['date'], '%Y-%m-%d')
+            formatted_date = dayObject.strftime("%B %d, %Y")
+            day = dayObject.day
+
+            if f'd{day}' not in dateObject:
+                dateObject[f'd{day}'] = []
+
+            event['color'] = {
+                'name' : event['color'],
+                'pastel': True
+            }
+            event['date'] = formatted_date
+            
+            dateObject[f'd{day}'].append(event)
+
+
+
+
+        # for date in eventSerializer.data:
+        #     if str(date['date']) == f"{year}-{month}-{day}":
+        #         date['requested_day'] = True
+        #     else:
+        #         date['requested_day'] = False
 
         refresh = RefreshToken.for_user(user)
 

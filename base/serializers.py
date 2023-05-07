@@ -4,7 +4,7 @@ from base.models import Event, CustomUser
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
-        fields = ['start', 'end', 'date', 'color', 'name']
+        fields = ['start', 'end', 'date', 'color', 'name', 'id']
 
 class UpcomingEventSerializer(serializers.ModelSerializer):
     class Meta:
