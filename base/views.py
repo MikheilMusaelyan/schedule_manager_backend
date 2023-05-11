@@ -16,13 +16,34 @@ class EventView(APIView):
     authentication_classes = [JWTAuthentication]
 
     def get(self, request, day=None, month=None, year=None):
-        
         userID = request.user.id
 
-        events = Event.objects.filter(date__year=year, date__month=month, userId=userID).order_by('date')
+        events = Event.objects.filter(date__year=year, date__month=month, userId=userID)
         eventSerializer = EventSerializer(events, many=True)
 
         dateObject = {}
+        now = datetime.now()
+
+        year = now.year
+        month = str(now.month).zfill(2)
+        hour = now.hour * 4
+        minute = now.minute
+
+        hour += math.floor(minute / 15)
+        print(userID)
+
+        first_condition_events = Event.objects.filter(
+            (Q(date=now.date()) & Q(start__gt=hour)),
+            userId=userID
+        ).order_by('start')[:3]
+        
+        remaining_events = Event.objects.filter(
+            Q(date__gt=now.date()),
+            userId=userID
+        ).order_by('date', 'start')[:3 - first_condition_events.count()]
+        
+        upcomingEvents = list(first_condition_events) + list(remaining_events)
+        upcomingEventSerializer = UpcomingEventSerializer(upcomingEvents, many=True)
 
         for event in eventSerializer.data:
             
@@ -41,7 +62,10 @@ class EventView(APIView):
             
             dateObject[f'd{day}'].append(event)
 
-        return Response(dateObject)
+        return Response({
+            'info': dateObject,
+            'upcoming': upcomingEventSerializer.data
+        })
     
     def post(self, request, pk=None):
         
@@ -122,18 +146,23 @@ class LoginView(APIView):
         minute = now.minute
 
         hour += math.floor(minute / 15)
-        print()
-        
-        upcomingEvents = Event.objects.filter(
-            Q(date__gt=now) | Q(date=now, start__gte=hour),
+
+        first_condition_events = Event.objects.filter(
+            (Q(date=now.date()) & Q(start__gt=hour)),
             userId=user.id
-        ).order_by('date', 'start')[:3]
+        ).order_by('start')[:3]
+        
+        remaining_events = Event.objects.filter(
+            Q(date__gt=now.date()),
+            userId=user.id
+        ).order_by('date', 'start')[:3 - first_condition_events.count()]
+        
+        upcomingEvents = list(first_condition_events) + list(remaining_events)
         upcomingEventSerializer = UpcomingEventSerializer(upcomingEvents, many=True)
         
-
         events = Event.objects.filter(date__year=year, date__month=month, userId=user.id)
         eventSerializer = EventSerializer(events, many=True)
-
+        
         dateObject = {}
 
         for event in eventSerializer.data:
@@ -153,7 +182,9 @@ class LoginView(APIView):
             
             dateObject[f'd{day}'].append(event)
 
-
+        for event in upcomingEventSerializer.data:
+            date = datetime.strptime(event['date'], "%Y-%m-%d").strftime("%B %d, %Y")
+            event['date'] = date
 
 
         # for date in eventSerializer.data:
@@ -167,7 +198,7 @@ class LoginView(APIView):
         return Response({
             'access': str(refresh.access_token),
             'refresh': str(refresh),
-            'events': eventSerializer.data,
+            'events': dateObject,
             'upcoming': upcomingEventSerializer.data
         }, status=status.HTTP_200_OK)
 
@@ -176,8 +207,8 @@ class SingupView(APIView):
     authentication_classes = []
     
     def post(self, request, **kwargs):
-        email = request.POST.get('email')
-        password = request.POST.get('password')
+        email = request.data.get('email')
+        password = request.data.get('password')
 
         try:
             user = CustomUser.objects.create_user(email=email, password=password, **kwargs,)
@@ -189,33 +220,31 @@ class SingupView(APIView):
             'access': str(refresh.access_token),
             'refresh': str(refresh)
         }, status=status.HTTP_201_CREATED)
-
+from time import sleep
 class SearchEvents(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        name = request.GET.get('name')
-        start = request.GET.get('start')
-        day = request.GET.get('day')
-        month = request.GET.get('month')
-        year = request.GET.get('year')
-
+    def get(self, request, date, start, name):
         user_id = int(request.user.id)
-
-
         filter_condition = Q(userId=user_id)
 
-        if name:
+       
+        if name == "-" and int(start) == -1 and date == "-":
+            return Response([])
+       
+        
+        if name != "-":
+            print('filtering name')
             filter_condition &= Q(name__icontains=name)
-        if start:
-            filter_condition &= Q(start=start)
-        if year:
-            filter_condition &= Q(date__year=year)
-        if month:
-            filter_condition &= Q(date__month=month)
-        if day:
-            filter_condition &= Q(date__day=day)
+
+        if int(start) != -1:
+            print('filtering start')
+            filter_condition &= Q(start=int(start))
+
+        if date != "-" and is_date(date):
+            print('filtering date')
+            filter_condition &= Q(date=date)
 
         events = Event.objects.filter(filter_condition)
         eventSerializer = EventSerializer(events, many=True)
@@ -247,3 +276,11 @@ class SearchEvents(APIView):
 #             return Response(colabSerializer.data, status=status.HTTP_201_CREATED)
 #         return Response(colabSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+from dateutil.parser import parse
+
+def is_date(string, fuzzy=False):
+    try: 
+        parse(string, fuzzy=fuzzy)
+        return True
+    except ValueError:
+        return False

@@ -11,7 +11,7 @@ urlpatterns = [
     path('event/<pk>/', EventView.as_view(), name='eventz'),
     path('event/<day>/<month>/<year>/', EventView.as_view(), name='eventz'),
 
-    path('search/', SearchEvents.as_view(), name='s')
+    path('search/<date>/<start>/<name>/', SearchEvents.as_view(), name='s')
 
     # path('index/', index.as_view(), name='index'),
 ]
