@@ -8,7 +8,7 @@ from django.conf import settings
 
 @shared_task
 def send_the_email():
-    sleep(10)
+    sleep(5)
 
     email_sender = settings.EMAIL_HOST_USER
     email_password = settings.EMAIL_HOST_PASSWORD
