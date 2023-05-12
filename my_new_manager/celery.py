@@ -3,6 +3,7 @@ from celery import Celery
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'my_new_manager.settings')
 
+
 app = Celery('my_new_manager')
 
 # - namespace='CELERY' means all celery-related configuration keys
