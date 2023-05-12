@@ -1,6 +1,7 @@
 from celery import shared_task
 from time import sleep
 
+
 import smtplib
 import ssl
 from email.message import EmailMessage
