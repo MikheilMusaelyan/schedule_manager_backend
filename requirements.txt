@@ -4,5 +4,4 @@ gunicorn==20.1.0
 celery==5.2.7
 importlib-metadata==4.13.0
 python-dotenv
-djangorestframework>=3.14.0
 django-cors-headers>=3.14.0
