@@ -25,8 +25,7 @@ class CustomUserManager(BaseUserManager):
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=50, unique=True)
-    # username = models.CharField(max_length=30, default='', unique=True)
-    password = models.CharField(max_length=20)
+    password = models.CharField(max_length=150)
     is_staff = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
@@ -36,7 +35,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 
 class Color(models.Model):
-    name = models.CharField(max_length=20, primary_key=True)
+    name = models.CharField(max_length=50, primary_key=True)
     pastel = models.BooleanField(default=False)
     
     def get_model_fields(model):
