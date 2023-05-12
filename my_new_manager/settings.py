@@ -107,7 +107,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'my_new_manager.wsgi.application'
+WSGI_APPLICATION = 'wsgi.application'
 
 
 # Database
