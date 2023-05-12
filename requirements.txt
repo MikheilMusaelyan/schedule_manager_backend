@@ -2,3 +2,4 @@ Django==3.2.19
 djangorestframework==3.14.0
 gunicorn==20.1.0
 celery==5.2.7
+importlib-metadata==4.13.0
