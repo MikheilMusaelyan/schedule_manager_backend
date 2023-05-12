@@ -1,6 +1,6 @@
 from celery import shared_task
 from time import sleep
-
+import os
 
 import smtplib
 import ssl
@@ -9,10 +9,11 @@ from django.conf import settings
 
 @shared_task
 def send_the_email():
+    print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
     sleep(10)
-
-    email_sender = settings.EMAIL_HOST_USER
-    email_password = settings.EMAIL_HOST_PASSWORD
+    print('sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss')
+    email_sender = os.getenv('EMAIL_HOST_USER')
+    email_password = os.getenv('EMAIL_HOST_PASSWORD')
 
     em = EmailMessage()
     em['From'] = email_sender

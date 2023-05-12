@@ -251,12 +251,13 @@ class SearchEvents(APIView):
 
         return Response(eventSerializer.data)
     
-# from base.tasks import send_the_email
-# class index(APIView):
-    # permission_classes = [AllowAny]
-    # def get(req,self):
-    #     send_the_email.delay()
-    #     return Response({'msg': 'hi'})
+from base.tasks import send_the_email
+ 
+class index(APIView):
+    permission_classes = [AllowAny]
+    def get(req,self):
+        send_the_email.delay()
+        return Response({'msg': 'hi'})
     
 # class Colaborations(APIView):
 #     permission_classes = [IsAuthenticated]
