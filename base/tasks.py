@@ -8,7 +8,6 @@ from django.conf import settings
 
 @shared_task
 def send_the_email():
-    print('12')
     sleep(15)
 
     email_sender = settings.EMAIL_HOST_USER
