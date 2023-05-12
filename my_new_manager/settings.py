@@ -66,9 +66,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:4200'
-]
+CORS_ALLOWED_ORIGINS = ['*']
 
 # CORS_ALLOW_METHODS = (
 #     'DELETE',
