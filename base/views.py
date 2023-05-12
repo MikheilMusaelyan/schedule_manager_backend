@@ -252,32 +252,10 @@ class SearchEvents(APIView):
         return Response(eventSerializer.data)
     
 from base.tasks import send_the_email
-from celery import shared_task
-from time import sleep
-import os
-
-import smtplib
-import ssl
-from email.message import EmailMessage
- 
 class index(APIView):
     permission_classes = [AllowAny]
     def get(req,self):
-        print('sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss')
-        email_sender = os.getenv('EMAIL_HOST_USER')
-        email_password = os.getenv('EMAIL_HOST_PASSWORD')
-
-        em = EmailMessage()
-        em['From'] = email_sender
-        em['To'] = 'fullstackmasters0@gmail.com'
-        em['Subject'] = 'subject'
-        em.set_content('body')
-
-        context = ssl.create_default_context()
-
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
-            smtp.login(email_sender, email_password)
-            smtp.sendmail(email_sender, 'fullstackmasters0@gmail.com', em.as_string())      
+        send_the_email.delay()
         return Response({'msg': 'hi'})
     
 # class Colaborations(APIView):
