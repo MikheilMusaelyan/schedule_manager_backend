@@ -2,23 +2,11 @@ from celery import shared_task
 from time import sleep
 import os, ssl, smtplib
 from email.message import EmailMessage
-import logging
-
-logger = logging.getLogger(__name__)
 
 @shared_task
 def send_the_email():
-    logger.debug('This is a debug message')
-    logger.info('This is an info message')
-    logger.warning('This is a warning message')
-    logger.error('This is an error message')
-    logger.critical('This is a critical message')
-    sleep(10)
-    logger.debug('This is a debug message')
-    logger.info('This is an info message')
-    logger.warning('This is a warning message')
-    logger.error('This is an error message')
-    logger.critical('This is a critical message')
+    print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+    print('sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss')
     email_sender = os.getenv('EMAIL_HOST_USER')
     email_password = os.getenv('EMAIL_HOST_PASSWORD')
 
