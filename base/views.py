@@ -226,8 +226,7 @@ class SearchEvents(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, date, start, name):
-        user_id = int(request.user.id)
-        filter_condition = Q(userId=user_id)
+        filter_condition = Q(userId=request.user.id)
 
        
         if name == "-" and int(start) == -1 and date == "-":
