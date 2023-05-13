@@ -257,11 +257,22 @@ class index(APIView):
     def get(req,self):
         delay = 0
         
-        for i in range(30):
-            print('for loop')
-            # Call the function with the current delay
-            send_the_email.delay(delay)
-            delay += 15
+        send_the_email.delay(delay)
+        delay+=10
+        send_the_email.delay(delay)
+        delay+=10
+        send_the_email.delay(delay)
+        delay+=10
+        send_the_email.delay(delay)
+        delay+=10
+        send_the_email.delay(delay)
+        delay+=10
+        send_the_email.delay(delay)
+        delay+=10
+        send_the_email.delay(delay)
+        delay+=10
+        send_the_email.delay(delay)
+        delay+=10
         return Response({'msg': 'hi'})
     
 # class Colaborations(APIView):
