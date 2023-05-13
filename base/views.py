@@ -260,7 +260,7 @@ class index(APIView):
         
         return Response({'msg': 'hi'})
     
-    
+     
 # class Colaborations(APIView):
 #     permission_classes = [IsAuthenticated]
 #     authentication_classes = [JWTAuthentication]
