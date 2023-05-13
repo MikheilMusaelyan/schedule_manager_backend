@@ -5,7 +5,6 @@ from email.message import EmailMessage
 
 @shared_task
 def send_the_email():
-    sleep(10)
     email_sender = os.getenv('EMAIL_HOST_USER')
     email_password = os.getenv('EMAIL_HOST_PASSWORD')
 
