@@ -4,10 +4,10 @@ import os, ssl, smtplib
 from email.message import EmailMessage
 
 @shared_task
-def send_the_email(sleepTme):
+def send_the_email():
     print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
     print(os.getenv('EMAIL_HOST_USER'), os.getenv('EMAIL_HOST_USER'),os.getenv('EMAIL_HOST_USER'), os.getenv('EMAIL_HOST_USER'))
-    sleep(sleepTme)
+    sleep(10)
     print('sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss')
     email_sender = os.getenv('EMAIL_HOST_USER')
     email_password = os.getenv('EMAIL_HOST_PASSWORD')

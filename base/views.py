@@ -257,7 +257,7 @@ class index(APIView):
     def get(req,self):
         delay = 0
         
-        send_the_email.delay(10)
+        send_the_email.delay()
         
         return Response({'msg': 'hi'})
     
