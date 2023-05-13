@@ -127,31 +127,37 @@ DATABASES = {
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'simple': {
+            'format': '%(levelname)s %(message)s',
+             'datefmt': '%y %b %d, %H:%M:%S',
+            },
+        },
     'handlers': {
         'console': {
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-            'level': 'DEBUG',
+            'formatter': 'simple'
         },
-        'file': {
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/path/to/logfile.log',
-            'maxBytes': 1024*1024*5,  # 5MB
-            'backupCount': 5,
+        'celery': {
             'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': 'celery.log',
+            'formatter': 'simple',
+            'maxBytes': 1024 * 1024 * 100,  # 100 mb
         },
     },
     'loggers': {
-        'django': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-        },
-        'your_app_name': {
-            'handlers': ['console', 'file'],
+        'celery': {
+            'handlers': ['celery', 'console'],
             'level': 'DEBUG',
         },
-    },
+    }
 }
+
+from logging.config import dictConfig
+dictConfig(LOGGING)
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

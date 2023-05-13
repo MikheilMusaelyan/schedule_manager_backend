@@ -220,7 +220,7 @@ class SingupView(APIView):
             'access': str(refresh.access_token),
             'refresh': str(refresh)
         }, status=status.HTTP_201_CREATED)
-from time import sleep
+
 class SearchEvents(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
