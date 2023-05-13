@@ -8,12 +8,12 @@ logger = logging.getLogger(__name__)
 
 @shared_task
 def send_the_email():
-    logger.info('msggggggggggggggggggggggggggg')
-    print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
-    print(os.getenv('EMAIL_HOST_USER'), os.getenv('EMAIL_HOST_USER'),os.getenv('EMAIL_HOST_USER'), os.getenv('EMAIL_HOST_USER'))
+    logger.debug('This is a debug message')
+    logger.info('This is an info message')
+    logger.warning('This is a warning message')
+    logger.error('This is an error message')
+    logger.critical('This is a critical message')
     sleep(10)
-    logger.info('msggggggggggggggggggggggggggg')
-    print('sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss')
     email_sender = os.getenv('EMAIL_HOST_USER')
     email_password = os.getenv('EMAIL_HOST_PASSWORD')
 
