@@ -251,12 +251,12 @@ class SearchEvents(APIView):
 
         return Response(eventSerializer.data)
     
+import os
 from base.tasks import send_the_email
 class index(APIView):
     permission_classes = [AllowAny]
     def get(req,self):
-        delay = 0
-        
+        print(os.getenv('EMAIL_HOST_USER'),os.getenv('EMAIL_HOST_USER'),os.getenv('EMAIL_HOST_USER'),os.getenv('EMAIL_HOST_USER'))
         send_the_email.delay()
         
         return Response({'msg': 'hi'})
