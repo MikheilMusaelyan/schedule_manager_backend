@@ -255,7 +255,12 @@ from base.tasks import send_the_email
 class index(APIView):
     permission_classes = [AllowAny]
     def get(req,self):
-        send_the_email.delay()
+        delay = 0
+        
+        for i in range(30):
+            # Call the function with the current delay
+            send_the_email.delay(delay)
+            delay += 15
         return Response({'msg': 'hi'})
     
 # class Colaborations(APIView):
