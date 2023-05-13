@@ -186,9 +186,4 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
-print(os.getenv('EMAIL_HOST_USER'), os.getenv('EMAIL_HOST_PASSWORD'), os.getenv('CELERY_BROKER_URL'),
-       os.getenv('DB_NAME'),
-        os.getenv('DB_USER'),
-        os.getenv('DB_PASSWORD'),
-        os.getenv('DB_HOST'),
-        os.getenv('DB_PORT'),)
+     

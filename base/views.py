@@ -256,7 +256,6 @@ from base.tasks import send_the_email
 class index(APIView):
     permission_classes = [AllowAny]
     def get(req,self):
-        print(os.getenv('EMAIL_HOST_USER'),os.getenv('EMAIL_HOST_USER'),os.getenv('EMAIL_HOST_USER'),os.getenv('EMAIL_HOST_USER'))
         send_the_email.delay()
         
         return Response({'msg': 'hi'})
