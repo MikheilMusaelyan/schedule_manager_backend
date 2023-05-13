@@ -228,7 +228,7 @@ class SearchEvents(APIView):
     def get(self, request, date, start, name):
         filter_condition = Q(userId=request.user.id)
 
-       
+        print('requestuserid,', request.user.id)
         if name == "-" and int(start) == -1 and date == "-":
             return Response([])
        
@@ -245,7 +245,8 @@ class SearchEvents(APIView):
             print('filtering date')
             filter_condition &= Q(date=date)
 
-        events = Event.objects.filter(filter_condition)
+        events = Event.objects.filter(filter_condition)[:20]
+        print('requestuserid,', events)
         eventSerializer = EventSerializer(events, many=True)
 
         return Response(eventSerializer.data)
