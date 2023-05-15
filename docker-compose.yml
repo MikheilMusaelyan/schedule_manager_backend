@@ -1,0 +1,62 @@
+version: '2'
+
+services:
+    server:
+        restart: unless-stopped
+        build:
+            context: .
+            dockerfile: ./docker/backend/Dockerfile
+        entrypoint: /app/docker/backend/server-entrypoint.sh
+        volumes:
+            - static_volume:/app/backend/django_static
+        expose:
+            - 8000     
+        environment:
+            DEBUG: "True"
+            CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+            DJANGO_DB: postgresql
+            POSTGRES_HOST: ${DB_HOST}
+            POSTGRES_NAME: ${DB_NAME}
+            POSTGRES_USER: ${DB_USER}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+            POSTGRES_PORT: ${DB_PORT}
+    worker:
+        restart: unless-stopped
+        build:
+            context: .
+            dockerfile: ./docker/backend/Dockerfile
+        entrypoint: /app/docker/backend/worker-entrypoint.sh
+        volumes:
+            - static_volume:/app/backend/django_static
+        environment:
+            DEBUG: "True"
+            CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+            DJANGO_DB: postgresql
+            POSTGRES_HOST: ${DB_HOST}
+            POSTGRES_NAME: ${DB_NAME}
+            POSTGRES_USER: ${DB_USER}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+            POSTGRES_PORT: ${DB_PORT}
+        depends_on:
+            - server
+            - redis
+    redis:
+        restart: unless-stopped
+        image: redis:7.0.5-alpine 
+        expose:
+            - 6479
+    db:
+        image: postgres:13.0-alpine
+        restart: unless-stopped
+        volumes:
+            - postgres_data:/var/lib/postgresql/data/
+        environment:
+            POSTGRES_DB: postgres
+            POSTGRES_USER: ${DB_USER}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+        expose:
+            - ${DB_PORT}
+    
+volumes:
+    static_volume: {}
+    postgres_data: {}

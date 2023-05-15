@@ -36,7 +36,8 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'base',
-    'corsheaders'
+    'corsheaders',
+    'django_celery_beat',
 ]
 
 AUTH_USER_MODEL = 'base.CustomUser'
@@ -171,14 +172,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
-CELERY_ACCEPT_CONTENT = ['json'] 
+CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
-CELERY_BEAT_SCHEDULE = {
-    'task-number-one': {
-        'task': 'base.tasks.send_the_email',
-        'schedule': 10,
-    },
-}
+
 
 # email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
