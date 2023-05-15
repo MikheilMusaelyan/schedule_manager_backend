@@ -4,6 +4,7 @@ RUN apk update && apk add python3-dev gcc libc-dev
 
 WORKDIR /app
 
+
 RUN pip install --upgrade pip
 RUN pip install gunicorn
 ADD ./requirements.txt /app/
