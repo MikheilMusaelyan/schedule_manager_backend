@@ -1,23 +1,23 @@
-#!/bin/sh
+# #!/bin/sh
 
-until cd /app/my_new_manager
-do
-    echo "Waiting for server volume..."
-done
-
-
-until python manage.py migrate
-do
-    echo "Waiting for db to be ready..."
-    sleep 2
-done
+# until cd /app/my_new_manager
+# do
+#     echo "Waiting for server volume..."
+# done
 
 
-python manage.py collectstatic --noinput
+# until python manage.py migrate
+# do
+#     echo "Waiting for db to be ready..."
+#     sleep 2
+# done
 
-# python manage.py createsuperuser --noinput
 
-gunicorn my_new_manager.wsgi --bind 0.0.0.0:8000 --workers 4 --threads 4
+# python manage.py collectstatic --noinput
 
-# for debug
-#python manage.py runserver 0.0.0.0:8000
+# # python manage.py createsuperuser --noinput
+
+# gunicorn my_new_manager.wsgi --bind 0.0.0.0:8000 --workers 4 --threads 4
+
+# # for debug
+# #python manage.py runserver 0.0.0.0:8000
