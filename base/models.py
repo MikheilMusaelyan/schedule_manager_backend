@@ -48,7 +48,7 @@ class Event(models.Model):
     name = models.CharField(max_length=50, default='(No title)')
     start = models.IntegerField(validators=[MaxValueValidator(95), MinValueValidator(0)])
     end = models.IntegerField(validators=[MaxValueValidator(96), MinValueValidator(1)])
-    date = models.DateField()
+    date = models.DateField(editable=False)
 
 # class CollabMember(models.Model):
 #     event = models.ForeignKey(Event, on_delete=models.CASCADE)
