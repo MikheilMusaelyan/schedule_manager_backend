@@ -48,7 +48,7 @@ class EventView(APIView):
         for event in eventSerializer.data:
             
             dayObject = datetime.strptime(event['date'], '%Y-%m-%d')
-            formatted_date = dayObject.strftime("%B %d, %Y")
+            formatted_date = dayObject.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
             day = dayObject.day
 
             if f'd{day}' not in dateObject:
