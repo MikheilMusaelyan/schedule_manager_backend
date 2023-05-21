@@ -48,6 +48,7 @@ class EventView(APIView):
         for event in eventSerializer.data:
             
             dayObject = datetime.strptime(event['date'], '%Y-%m-%d')
+            dayObject = dayObject.replace(hour=7)
             formatted_date = dayObject.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
             day = dayObject.day
 
