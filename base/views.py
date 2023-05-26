@@ -55,10 +55,9 @@ class EventView(APIView):
             if f'd{day}' not in dateObject:
                 dateObject[f'd{day}'] = []
 
-            color = event['color']
             event['color'] = {
-                'name' : color.name,
-                'pastel': color.pastel
+                'name' : event['color'],
+                'pastel': False
             }
             event['date'] = formatted_date
             
@@ -175,7 +174,7 @@ class LoginView(APIView):
 
             if f'd{day}' not in dateObject:
                 dateObject[f'd{day}'] = []
-
+            
             event['color'] = {
                 'name' : event['color'],
                 'pastel': True
