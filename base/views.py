@@ -18,7 +18,7 @@ class EventView(APIView):
     def get(self, request, day=None, month=None, year=None):
         userID = request.user.id
 
-        events = Event.objects.filter(date__year=year, date__month=month, userId=userID)
+        events = Event.objects.select_related('color').filter(date__year=year, date__month=month, userId=userID)
         eventSerializer = EventSerializer(events, many=True)
 
         dateObject = {}
@@ -32,12 +32,12 @@ class EventView(APIView):
         hour += math.floor(minute / 15)
         print(userID)
 
-        first_condition_events = Event.objects.filter(
+        first_condition_events = Event.objects.select_related('color').filter(
             (Q(date=now.date()) & Q(start__gt=hour)),
             userId=userID
         ).order_by('start')[:3]
         
-        remaining_events = Event.objects.filter(
+        remaining_events = Event.objects.select_related('color').filter(
             Q(date__gt=now.date()),
             userId=userID
         ).order_by('date', 'start')[:3 - first_condition_events.count()]
@@ -55,9 +55,10 @@ class EventView(APIView):
             if f'd{day}' not in dateObject:
                 dateObject[f'd{day}'] = []
 
+            color = event['color']
             event['color'] = {
-                'name' : event['color'],
-                'pastel': True
+                'name' : color.name,
+                'pastel': color.pastel
             }
             event['date'] = formatted_date
             
