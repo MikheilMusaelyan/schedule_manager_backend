@@ -140,25 +140,13 @@ class LoginView(APIView):
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
         
         now = datetime.now()
-
         year = now.year
         month = str(now.month).zfill(2)
         hour = now.hour * 4
         minute = now.minute
-
         hour += math.floor(minute / 15)
 
-        first_condition_events = Event.objects.filter(
-            (Q(date=now.date()) & Q(start__gt=hour)),
-            userId=user.id
-        ).order_by('start')[:3]
-        
-        remaining_events = Event.objects.filter(
-            Q(date__gt=now.date()),
-            userId=user.id
-        ).order_by('date', 'start')[:3 - first_condition_events.count()]
-        
-        upcomingEvents = list(first_condition_events) + list(remaining_events)
+        upcomingEvents = returnUpcomingEvents(now, hour, user.id)
         upcomingEventSerializer = UpcomingEventSerializer(upcomingEvents, many=True)
         
         events = Event.objects.filter(date__year=year, date__month=month, userId=user.id)
@@ -279,6 +267,19 @@ class index(APIView):
 #             colabSerializer.save()
 #             return Response(colabSerializer.data, status=status.HTTP_201_CREATED)
 #         return Response(colabSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+def returnUpcomingEvents(now, hour, id):
+    first_condition_events = Event.objects.filter(
+        (Q(date=now.date()) & Q(start__gt=hour)),
+        userId=id
+    ).order_by('start')[:3]
+    
+    remaining_events = Event.objects.filter(
+        Q(date__gt=now.date()),
+        userId=id
+    ).order_by('date', 'start')[:3 - first_condition_events.count()]
+
+    return list(first_condition_events) + list(remaining_events)
 
 from dateutil.parser import parse
 
