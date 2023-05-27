@@ -142,9 +142,7 @@ class LoginView(APIView):
         now = datetime.now()
         year = now.year
         month = str(now.month).zfill(2)
-        hour = now.hour * 4
-        minute = now.minute
-        hour += math.floor(minute / 15)
+        hour = (now.hour * 4) + math.floor(now.minute / 15)
 
         upcomingEvents = returnUpcomingEvents(now, hour, user.id)
         upcomingEventSerializer = UpcomingEventSerializer(upcomingEvents, many=True)
