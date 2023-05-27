@@ -9,7 +9,7 @@ from base.serializers import EventSerializer, UpcomingEventSerializer, PutEventS
 
 from datetime import datetime
 from django.db.models import Q
-from datetime import datetime
+from datetime import datetime, timedelta
     
 class EventView(APIView):
     permission_classes = [IsAuthenticated]
@@ -142,10 +142,6 @@ class LoginView(APIView):
         now = datetime.now()
         year = now.year
         month = str(now.month).zfill(2)
-        hour = (now.hour * 4) + math.floor(now.minute / 15)
-
-        upcomingEvents = returnUpcomingEvents(now, hour, user.id)
-        upcomingEventSerializer = UpcomingEventSerializer(upcomingEvents, many=True)
         
         events = Event.objects.filter(date__year=year, date__month=month, userId=user.id)
         eventSerializer = EventSerializer(events, many=True)
@@ -169,11 +165,6 @@ class LoginView(APIView):
             
             dateObject[f'd{day}'].append(event)
 
-        for event in upcomingEventSerializer.data:
-            date = datetime.strptime(event['date'], "%Y-%m-%d").strftime("%B %d, %Y")
-            event['date'] = date
-
-
         # for date in eventSerializer.data:
         #     if str(date['date']) == f"{year}-{month}-{day}":
         #         date['requested_day'] = True
@@ -186,7 +177,6 @@ class LoginView(APIView):
             'access': str(refresh.access_token),
             'refresh': str(refresh),
             'events': dateObject,
-            'upcoming': upcomingEventSerializer.data
         }, status=status.HTTP_200_OK)
 
 class SingupView(APIView):
