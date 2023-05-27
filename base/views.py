@@ -246,7 +246,26 @@ class index(APIView):
         send_the_email.delay()
         
         return Response({'msg': 'hi'})
+
+class getUpcomingEvents(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     
+    def get(self, request):
+        now = datetime.now()
+        hour = (now.hour * 4) + math.floor(now.minute / 15)
+        
+        upcomingEvents = returnUpcomingEvents(now, hour, request.user.id)
+        upcomingEventSerializer = UpcomingEventSerializer(upcomingEvents, many=True)
+
+        for event in upcomingEventSerializer.data:
+            date = datetime.strptime(event['date'], "%Y-%m-%d").strftime("%B %d, %Y")
+            event['date'] = date
+
+        return Response({
+            'upcoming': upcomingEventSerializer.data
+        }, status=status.HTTP_200_OK)
+        
     
 # class Colaborations(APIView):
 #     permission_classes = [IsAuthenticated]
