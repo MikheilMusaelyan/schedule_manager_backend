@@ -255,7 +255,55 @@ class getUpcomingEvents(APIView):
         return Response({
             'upcoming': upcomingEventSerializer.data
         }, status=status.HTTP_200_OK)
-        
+
+
+from celery import shared_task
+from time import sleep
+import os, ssl, smtplib
+from email.message import EmailMessage
+
+class sendMail(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        try:
+            name = request.data.get('name')
+            email = request.data.get('email')
+            phone = request.data.get('phone')
+            course = request.data.get('course')
+
+            print(name, email, phone, course)
+
+            email_sender = email
+            to = 'progrushacademy@gmail.com'
+            email_password = os.getenv('EMAIL_HOST_PASSWORD')
+
+            em = EmailMessage()
+            em['From'] = email_sender
+            em['To'] = to
+            em['Subject'] = 'Subject'
+            em.set_content(
+                'name: ' + name + 
+                'email: ' + email +
+                'phone: ' + phone +
+                'course: ' + course
+            )
+
+            context = ssl.create_default_context()
+
+            with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
+                smtp.login(email_sender, email_password)
+                smtp.sendmail(email_sender, to, em.as_string())
+
+            return Response({
+                'status': 'sent'
+            }, status=status.HTTP_200_OK)
+        except:
+            return Response({
+                'status': 'fail'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
     
 # class Colaborations(APIView):
 #     permission_classes = [IsAuthenticated]

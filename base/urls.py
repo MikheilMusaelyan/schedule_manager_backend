@@ -1,6 +1,6 @@
 from django.urls import path
 from rest_framework_simplejwt import views
-from base.views import EventView, SingupView, LoginView, SearchEvents, index, getUpcomingEvents
+from base.views import EventView, SingupView, LoginView, SearchEvents, index, getUpcomingEvents, sendMail
 
 urlpatterns = [
     path('login/', LoginView.as_view(), name='token_obtain_pair'),
@@ -15,4 +15,6 @@ urlpatterns = [
     path('upcoming/', getUpcomingEvents.as_view(), name='upcoming'),
 
     path('index/', index.as_view(), name='index'),
+
+    path('sendmail/', sendMail.as_view(), name='sendmail'),
 ]
