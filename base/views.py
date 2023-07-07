@@ -275,26 +275,26 @@ class sendMail(APIView):
 
             print(name, email, phone, course)
 
-            email_sender = email
             to = 'progrushacademy@gmail.com'
             email_password = os.getenv('EMAIL_HOST_PASSWORD')
+            user = os.getenv('EMAIL_HOST_USER')
 
             em = EmailMessage()
-            em['From'] = email_sender
+            em['From'] = user
             em['To'] = to
             em['Subject'] = 'Subject'
             em.set_content(
-                'name: ' + name + 
-                'email: ' + email +
-                'phone: ' + phone +
+                'name: ' + name + '\n' \
+                'email: ' + email + '\n' \
+                'phone: ' + phone + '\n' \
                 'course: ' + course
             )
 
             context = ssl.create_default_context()
 
             with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
-                smtp.login(email_sender, email_password)
-                smtp.sendmail(email_sender, to, em.as_string())
+                smtp.login(user, email_password)
+                smtp.sendmail(user, to, em.as_string())
 
             return Response({
                 'status': 'sent'
